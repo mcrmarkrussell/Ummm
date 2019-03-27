@@ -1,0 +1,75 @@
+//////
+@canceltarget
+////// TIMERS //////
+if not timerexists 'ASB'
+  createtimer 'ASB'
+  settimer 'ASB' 600000
+endif
+////// ALIAS //////
+if not findalias 'birdspot'
+  headmsg 'TARGET BIRD RUNE'
+  msg 'bank'
+  promptalias 'birdspot'
+endif
+if not findalias 'home'
+  headmsg 'TARGET BANK RUNE'
+  promptalias 'home'
+endif
+if not findalias 'sparring_partner'
+  headmsg 'TARGET SPARRING PARTNER'
+  promptalias 'sparring_partner'
+endif
+////// Active Bonus //////
+if not listexists 'birds'
+  createlist 'birds'
+endif
+if timer 'ASB' >= 600000
+  if mana < 24
+    useskill 'meditation'
+    pause 12000
+  else
+    msg 'bank'
+    pause 200
+    cast 'recall'
+    waitfortarget 10000
+    target! 'birdspot'
+    pause 500
+    while not dead
+      for 0 to 'birds'
+        pushlist 'birds' 0x6
+        if not targetexists
+          cast 'Lightning'
+          pause 1250
+        elseif @findtype birds[] 'any' 'ground' 1 12
+          if innocent 'found'
+            @ignoreobject 'found'
+          else
+            target! 'found'
+            pause 3000
+            if injournal 'fame' 'system'
+              settimer 'ASB' 0
+              @clearjournal
+            endif
+          endif
+        endif
+        if timer 'ASB' < 600000
+          cast 'recall'
+          waitfortarget 10000
+          target! 'home'
+          replay
+        endif
+        @clearlist 'birds'
+      endfor
+    endwhile
+  endif
+endif
+////// Skills //////
+if skill 'wrestling' < 100
+  pause 1000
+  attack 'sparring_partner'
+  pause 500
+endif
+if skill 'wrestling' > 100
+  pause 1000
+  stop
+endif
