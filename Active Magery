@@ -1,0 +1,174 @@
+////////////////////////////////////////////
+@canceltarget
+////////////////////////////////////////////
+/////////////// TIMERS /////////////////////
+////////////////////////////////////////////
+if not timerexists 'Bandage Timer'
+  createtimer 'Bandage Timer'
+  settimer 'Bandage Timer' 15100
+endif
+if not timerexists 'ASB'
+  createtimer 'ASB'
+  settimer 'ASB' 600000
+endif
+if not timerexists 'food'
+  createtimer 'food'
+  settimer 'food' 3600000
+endif
+////////////////////////////////////////////
+//////////////// ALIAS /////////////////////
+////////////////////////////////////////////
+if skill 'magery' >= 70
+  if not findalias 'birdspot'
+    headmsg 'TARGET BIRD RUNE'
+    msg 'bank'
+    promptalias 'birdspot'
+  endif
+  if not findalias 'home'
+    headmsg 'TARGET BANK RUNE'
+    promptalias 'home'
+  endif
+endif
+////////////////////////////////////////////
+//////// Active Skillgain Bonus ////////////
+////////////////////////////////////////////
+if not listexists 'birds'
+  createlist 'birds'
+endif
+if timer 'ASB' >= 600000
+  if mana < 40
+    useskill 'meditation'
+    pause 12000
+  else
+    msg 'bank'
+    pause 200
+    cast 'recall'
+    waitfortarget 10000
+    target! 'birdspot'
+    pause 500
+    while not dead
+      for 0 to 'birds'
+        pushlist 'birds' 0x6
+        if not targetexists
+          cast 'Lightning'
+          pause 1250
+        elseif @findtype birds[] 'any' 'ground' 1 12
+          if innocent 'found'
+            @ignoreobject 'found'
+          else
+            target! 'found'
+            pause 3000
+            if injournal 'fame' 'system'
+              settimer 'ASB' 0
+              @clearjournal
+            endif
+          endif
+        endif
+        if timer 'ASB' < 600000
+          cast 'recall'
+          waitfortarget 10000
+          target! 'home'
+          replay
+        endif
+        @clearlist 'birds'
+      endfor
+    endwhile
+  endif
+endif
+////////////////////////////////////////////
+///////////////// Food /////////////////////
+////////////////////////////////////////////
+if timer 'food' > 3600000
+  if not findtype '0x97d' 'any' 'backpack'
+    cast 'create food'
+    pause 3500
+    usetype '0x97d' 'any' 'backpack'
+    settimer 'food' 0
+  else
+    usetype '0x97d' 'any' 'backpack'
+    settimer 'food' 0
+  endif
+endif
+////////////////////////////////////////////
+///////////////// Magery ///////////////////
+////////////////////////////////////////////
+if skill 'magery' < 60
+  if diffhits > 15 or mana < 11
+    if timer 'Bandage Timer' > 15100
+      bandageself
+      waitfortarget 10000
+      target! 'self'
+      settimer 'Bandage Timer' 0
+    endif
+    if mana < 11
+      useskill 'meditation'
+      pause 12000
+    endif
+  else
+    cast "Lightning"
+    waitfortarget 10000
+    target! 'self'
+    pause 1000
+  endif
+elseif skill 'magery' < 70
+  if diffhits > 15 or mana < 20
+    if timer 'Bandage Timer' > 15100
+      bandageself
+      waitfortarget 10000
+      target! 'self'
+      settimer 'Bandage Timer' 0
+    endif
+    if mana < 20
+      useskill 'meditation'
+      pause 12000
+    endif
+  else
+    cast "Energy Bolt"
+    waitfortarget 10000
+    target! 'self'
+    pause 1000
+  endif
+elseif skill 'magery' < 80
+  if diffhits > 15 or mana < 40
+    if timer 'Bandage Timer' > 15100
+      bandageself
+      waitfortarget 10000
+      target! 'self'
+      settimer 'Bandage Timer' 0
+    endif
+    if mana < 40
+      useskill 'meditation'
+      pause 12000
+    endif
+  else
+    cast "Flame Strike"
+    waitfortarget 10000
+    target! 'self'
+    pause 1000
+  endif
+elseif skill 'magery' < 100
+  if diffhits > 15 or mana < 50
+    if timer 'Bandage Timer' > 15100
+      bandageself
+      waitfortarget 10000
+      target! 'self'
+      settimer 'Bandage Timer' 0
+    endif
+    if mana < 50
+      useskill 'meditation'
+      pause 12000
+    endif
+  else
+    cast "Summon Air Elemental"
+    pause 7600
+    if followers > 0
+      msg 'all release'
+      waitforgump 0x3780b38e 15000
+      replygump 0x3780b38e 1
+      pause 650
+    endif
+  endif
+elseif skill 'magery' >= 100
+  headmsg 'done'
+  stop
+endif
